@@ -65,10 +65,8 @@ static InterpretResult run(){
     case OP_MULTIPLY: BINARY_OP(*); break;
     case OP_DIVIDE:   BINARY_OP(/); break;
     case OP_NEGATE:{
-      for(int i = 1; i < 900000000; i++){
-        vm.stack[*vm.ip]  *= -1; break; // Optimization
-	//push(-pop());  break; // Book method
-      }
+      vm.stack[*vm.ip]  *= -1; break; // Optimization
+      //push(-pop());  break; // Book method
     }
     case OP_RETURN:{
       printValue(pop());
