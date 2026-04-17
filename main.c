@@ -23,29 +23,29 @@ static void repl(){
 }
 
 static char* readFile(const char* path){
-  FILE* file = fopen(path, "rb");
+    FILE* file = fopen(path, "rb");
 
-  if(file == NULL){
-      fprintf(stderr, "Could not open file \"%s\".\n", path);
-      exit(74);
-  }
+    if(file == NULL){
+        fprintf(stderr, "Could not open file \"%s\".\n", path);
+        exit(74);
+    }
   
-  fseek(file, 0L, SEEK_END);
-  size_t fileSize = ftell(file);
-  rewind(file);
+    fseek(file, 0L, SEEK_END);
+    size_t fileSize = ftell(file);
+    rewind(file);
 
-  char* buffer = (char*)malloc(fileSize + 1);
-  if(buffer == NULL){
-    fprintf(stderr, "Not enough memory to read \"%s\"", path);
-    exit(74);
-  }
-  size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
-  if(bytesRead < fileSize){
-    fprintf(stderr, "Could not read file \"%s\"", path);
-  }
+    char* buffer = (char*)malloc(fileSize + 1);
+    if(buffer == NULL){
+        fprintf(stderr, "Not enough memory to read \"%s\"", path);
+        exit(74);
+    }
+    size_t bytesRead = fread(buffer, sizeof(char), fileSize, file);
+    if(bytesRead < fileSize){
+        fprintf(stderr, "Could not read file \"%s\"", path);
+    }
   
-  fclose(file);
-  return buffer;
+    fclose(file);
+    return buffer;
 }
 
 static void runFile(const char* path){
@@ -70,56 +70,7 @@ int main(int argc, const char* argv[])
     fprintf(stderr, "Usage: clox [path]\n");
   }
   
-  Chunk chunk;
-  initChunk(&chunk);
-  //printf("\n===============\n %s", "HI");
-
-  /* int constant = addConstant(&chunk, 1.2); */
-  /* writeChunk(&chunk, OP_CONSTANT, 123); */
-  /* writeChunk(&chunk, constant, 123); // Don't be fooled by the 123 - those are placeholders for line numbers. */
-  
-  /* constant = addConstant(&chunk, 3.4); */
-  /* writeChunk(&chunk, OP_CONSTANT, 123); */
-  /* writeChunk(&chunk, constant, 123); */
-  
-  /* writeChunk(&chunk, OP_ADD, 123); */
-
-  /* constant = addConstant(&chunk, 5.6); */
-  /* writeChunk(&chunk, OP_CONSTANT, 123); */
-  /* writeChunk(&chunk, constant, 123); */
-
-  /* writeChunk(&chunk, OP_DIVIDE, 123); */
-  
-  
-
-  /* writeChunk(&chunk, OP_NEGATE, 123); */
-
-  /* writeChunk(&chunk, OP_RETURN, 123); */
-
-  int constant = addConstant(&chunk, 1);
-  writeChunk(&chunk, OP_CONSTANT, 123);
-  writeChunk(&chunk, constant, 123);
-
-  constant = addConstant(&chunk, 2);
-  writeChunk(&chunk, OP_CONSTANT, 123);
-  writeChunk(&chunk, constant, 123);
-
-  writeChunk(&chunk, OP_MULTIPLY, 123);
-
-  constant = addConstant(&chunk, 3);
-  writeChunk(&chunk, OP_CONSTANT, 123);
-  writeChunk(&chunk, constant, 123);
-
-  writeChunk(&chunk, OP_NEGATE, 123);
-
-  writeChunk(&chunk, OP_ADD, 123);
-
-  writeChunk(&chunk, OP_RETURN, 123);
-
-  disassembleChunk(&chunk, "test chunk");
-  interpret(&chunk);
   freeVM();
-  freeChunk(&chunk);
   return 0;
 }
 

@@ -29,7 +29,7 @@ static bool isDigit(char c){
 }
 
 static bool isAtEnd(){
-    return *scanner.current == "\0";
+    return *scanner.current == '\0';
 }
 
 static char advance(){
@@ -57,7 +57,7 @@ static Token makeToken(TokenType type){
     Token token;
     token.type = type;
     token.start = scanner.start;
-    token.length = (int)(scanner.current = scanner.start);
+    token.length = (int)(scanner.current - scanner.start);
     token.line = scanner.line;
     return token;
 }
@@ -138,6 +138,8 @@ static TokenType identifierType(){
     case 'v': return checkKeyword(1,2, "ar", TOKEN_VAR);
     case 'w': return checkKeyword(1,4, "hile", TOKEN_WHILE);
     }
+
+    return TOKEN_IDENTIFIER;
 }
 
 
@@ -178,7 +180,6 @@ Token scanToken(){
     scanner.start = scanner.current;
 
     if(isAtEnd()) return makeToken(TOKEN_EOF);
-
     char c = advance();
 
     if(isAlpha(c)) return identifier();

@@ -38,7 +38,7 @@ static InterpretResult run(){
     double a = pop(); \
     push(a op b);     \
   } while (false)
-  
+  printf("== Interpreter ==");
   for(;;){
 #ifdef DEBUG_TRACE_EXECUTION
     printf("        ");
@@ -84,7 +84,20 @@ static InterpretResult run(){
 }
 
 
-InterpretResult interpret(char* source){
-  compile(source);
-  return INTERPRET_OK;
+InterpretResult interpret(const char* source){
+  Chunk chunk;
+  initChunk(&chunk);
+
+  if(!compile(source, &chunk)){
+    freeChunk(&chunk);
+    return INTERPRET_COMPILE_ERROR;
+  }
+
+  vm.chunk = &chunk;
+  vm.ip = vm.chunk->code;
+
+  InterpretResult result = run();
+
+  freeChunk(&chunk);
+  return result;
 }
