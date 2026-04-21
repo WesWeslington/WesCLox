@@ -64,7 +64,7 @@ static InterpretResult run(){
         double b = AS_NUMBER(pop());                            \
         double a = AS_NUMBER(pop());                            \
         push(valueType(a op b));                                \
-    } while (false)
+    } while (false)                                                
     printf("== Interpreter ==");
     for(;;){
 #ifdef DEBUG_TRACE_EXECUTION
@@ -112,6 +112,21 @@ static InterpretResult run(){
         // AS_NUMBER(vm.stack[*vm.ip])  *= -1; break; // Optimization that is not currently accurate (followup later)
         push(NUMBER_VAL(-AS_NUMBER(pop())));  break; // Book method
     }
+    // Ternary
+    case OP_QUERY:
+        vm.ip++;
+        bool isTruthy = AS_BOOL(pop());
+        Value truthyVal =  READ_CONSTANT();
+
+        vm.ip++;
+        Value falseyVal = READ_CONSTANT();
+
+        if(isTruthy){
+            push(truthyVal);
+        }else{
+            push(falseyVal);
+        }
+        break;
     case OP_RETURN:{
       printValue(pop());
       printf("\n");

@@ -16,6 +16,7 @@ typedef struct{
     bool panicMode;
 } Parser;
 
+// Lowest to highest
 typedef enum{
     PREC_NONE,
     PREC_ASSIGNMENT, // =
@@ -27,7 +28,8 @@ typedef enum{
     PREC_FACTOR,     // * /
     PREC_UNARY,      // ! -
     PREC_CALL,       // . ()
-    PREC_PRIMARY
+    PREC_PRIMARY,
+    PREC_TERNARY     // x ? y : z (will be needed for recursive ternary)
 } Precedence;
 
 typedef void (*ParseFn)();
@@ -156,6 +158,13 @@ static void parsePrecedence(Precedence precedence){
     }
 }
 
+// bool ? x : y
+static void ternary(){
+    emitByte(OP_QUERY);
+    expression();
+    consume(TOKEN_COLON, "Colon expected");
+    expression();
+}
 
 static void expression(){
     parsePrecedence(PREC_ASSIGNMENT);
@@ -183,6 +192,7 @@ static void binary(){
     case TOKEN_MINUS: emitByte(OP_SUBTRACT); break;
     case TOKEN_STAR:  emitByte(OP_MULTIPLY); break;
     case TOKEN_SLASH: emitByte(OP_DIVIDE); break;
+    case TOKEN_QUERY: emitByte(OP_QUERY); break;
     default:
         return; // Unreachable
     }
@@ -251,6 +261,7 @@ ParseRule rules[] = {
     [TOKEN_VAR]             = {NULL,    NULL, PREC_NONE},
     [TOKEN_WHILE]           = {NULL,    NULL, PREC_NONE},
     [TOKEN_ERROR]           = {NULL,    NULL, PREC_NONE},
+    [TOKEN_QUERY]        = {NULL,    ternary, PREC_ASSIGNMENT},
     [TOKEN_EOF]             = {NULL,    NULL, PREC_NONE}
 };
 
@@ -268,7 +279,7 @@ bool compile(const char* source, Chunk* chunk){
      advance();
     
      expression();
-     //consume(TOKEN_EOF, "Expect end of expression.");
+     consume(TOKEN_EOF, "Expect end of expression.");
 
      endCompiler();
      return !parser.hadError;
