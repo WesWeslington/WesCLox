@@ -1,0 +1,7 @@
+var GlobalString = "ExpectedString";
+
+var GlobalBool = true;
+
+var Result = GlobalBool ? GlobalString : "UnexpectedString";
+
+print "The result is: " + Result;

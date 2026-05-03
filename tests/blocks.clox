@@ -1,0 +1,11 @@
+var globalVar = 67;
+
+{
+
+var localVar = 666;
+
+print localVar == 67 ? "CHICKEN" : "BORGER";
+
+}
+
+globalVar == 69;
