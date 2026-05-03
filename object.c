@@ -22,7 +22,7 @@ static Obj* allocateObject(size_t size, ObjType type){
 static ObjString* allocateString(char* chars, int length, uint32_t hash){
     ObjString* string = ALLOCATE_OBJ(ObjString, OBJ_STRING);
     string->hash = hash;
-    string->length = length;
+      string->length = length;
     string->chars = chars;
 
     tableSet(&vm.strings, string, NIL_VAL);
