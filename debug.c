@@ -101,6 +101,8 @@ int disassembleInstruction(Chunk* chunk, int offset){
       return simpleInstruction("OP_EQUAL", offset);
   case OP_QUERY:
       return simpleInstruction("OP_QUERY", offset);
+  case OP_EOF:
+      return simpleInstruction("OP_EOF (temp program end signal)", offset);
   default:
       printf("Unknown opcode %d\n", instruction);
       return offset + 1;
