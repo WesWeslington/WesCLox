@@ -1,0 +1,1 @@
+var global; { var a = "cheese"; fun b(){ print a + "burger";} global = b; } global();
