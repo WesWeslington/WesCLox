@@ -23,7 +23,14 @@ typedef struct{
     Table globals;
     Table strings;
     ObjUpvalue* openUpvalues;
+
+    size_t bytesAllocated;
+    size_t nextGC;
     Obj* objects; // the head of the linked list of (Obj*)Obj.next on the heap
+
+    int grayCount;
+    int grayCapacity;
+    Obj** grayStack;
 } VM;
 
 
