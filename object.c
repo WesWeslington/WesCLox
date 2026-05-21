@@ -53,6 +53,19 @@ ObjClosure* newClosure(ObjFunction* function){
     return closure;
 }
 
+ObjClass* newClass(ObjString* name){
+    ObjClass* klass = ALLOCATE_OBJ(ObjClass, OBJ_CLASS);
+    klass->name = name;
+    return klass;
+}
+
+ObjInstance* newInstance(ObjClass* klass){
+    ObjInstance* instance = ALLOCATE_OBJ(ObjInstance, OBJ_INSTANCE);
+    instance->klass = klass;
+    initTable(&instance->fields);
+    return instance;
+}
+
 ObjUpvalue* newUpvalue(Value* slot){
     ObjUpvalue* upvalue = ALLOCATE_OBJ(ObjUpvalue, OBJ_UPVALUE);
     upvalue->next = NULL;
@@ -116,11 +129,17 @@ static void printFunction(ObjFunction* function){
 
 void printObject(Value value){
     switch(OBJ_TYPE(value)){
+    case OBJ_CLASS:
+        printf("%s", AS_CLASS(value)->name->chars);
+        break;
     case OBJ_CLOSURE:
         printFunction(AS_CLOSURE(value)->function);
         break;
     case OBJ_FUNCTION:
         printFunction(AS_FUNCTION(value));
+        break;
+    case OBJ_INSTANCE:
+        printf("%s instance", AS_INSTANCE(value)->klass->name->chars);
         break;
     case OBJ_STRING:
         printf("%s", AS_CSTRING(value));
