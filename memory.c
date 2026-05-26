@@ -9,6 +9,8 @@
 #include "debug.h"
 #endif 
 
+#undef DEBUG_LOG_GC
+
 void* reallocate(void* pointer, size_t oldSize, size_t newSize){
     vm.bytesAllocated += newSize - oldSize;
     if(newSize > oldSize){
@@ -67,7 +69,13 @@ static void freeObject(Obj* object){
 #endif
     
     switch(object->type){
+    case OBJ_BOUND_METHOD:{
+        FREE(ObjBoundMethod, object);
+        break;
+    }
     case OBJ_CLASS:{
+        ObjClass* klass = (ObjClass*)object;
+        freeTable(&klass->methods);
         FREE(ObjClass, object);
         break;
     }
@@ -123,6 +131,7 @@ static void markRoots(){
     
     markTable(&vm.globals);
     markCompilerRoots();
+    markObject((Obj*)vm.initString);
 }
 
 // A "black" object is any object whose isMarked field is set
@@ -135,9 +144,16 @@ static void blackenObject(Obj* object){
 #endif
     
     switch(object->type){
+    case OBJ_BOUND_METHOD:{
+        ObjBoundMethod* bound = (ObjBoundMethod*)object;
+        markValue(bound->receiver);
+        markObject((Obj*)bound->method);
+        break;
+    }
     case OBJ_CLASS:{
         ObjClass* klass = (ObjClass*)object;
         markObject((Obj*)klass->name);
+        markTable(&klass->methods);
         break;
     }
     case OBJ_CLOSURE:{

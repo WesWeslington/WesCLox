@@ -1,0 +1,10 @@
+class c2{ init(val1) { print val1; } } var C2 = c2("Real Life Value");
+class c1{ init(i1, i2){ this.i1 = i1; this.i2 = i2;} f(){ print "initializer 1 = " + this.i1 + " initializer 2 = " + this.i2; } } var C1 = c1("fizz", "buzz"); C1.f();
+class c3{ init(i1, i2){ this.i1 = i1; this.i2 = i2;} f(){ print "We can call the method still"; } } var C3 = c3("1", "2"); C3.f(); 
+class n{ m(){ fun function() { print "Aint nothin but a thing"; } function(); } } var N = n(); N.m();
+class s{ t(first, second){ print "First " + first + " Second " + second; } } var S = s(); S.t("firsty", "secondy");
+class b { e() {}} var B = b(); var E = B.e;
+class z {} var Z = z(); Z.a = "new A value"; print Z.a;
+class c{ init(v1){this.v1 = v1;} f(){ print "f called with " + this.v1; } t(){print this;} } var C0 = c("VARIABLE"); var F0 = C0.f; F0(); var T0 = C0.t; T0();
+class x{ init(y){ print this; } Fun(){print this;} } var X = x("HI"); X.Fun();
+class x1{ Fun(){print this;} } var X1 = x1(); X1.Fun();
