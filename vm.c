@@ -276,7 +276,10 @@ static InterpretResult run(){
         push(valueType(a op b));                                \
     } while (false)                                                
 
-    printf("\n======== Dissassemble Instruction =======\n");
+#ifdef DEBUG_TRACE_EXECUTION
+printf("\n======== Dissassemble OP Instruction =======\n");
+#endif
+ 
     for(;;){
 #ifdef DEBUG_TRACE_EXECUTION
         printf("        ");
@@ -396,6 +399,15 @@ static InterpretResult run(){
         push(BOOL_VAL(valuesEqual(a, b)));
         break;
     }
+    case OP_GET_SUPER:{
+        ObjString* name = READ_STRING();
+        ObjClass* superclass = AS_CLASS(pop());
+
+        if(!bindMethod(superclass, name)){
+            return INTERPRET_RUNTIME_ERROR;
+        }
+        break;
+    }
     case OP_GREATER: BINARY_OP(BOOL_VAL, >); break;
     case OP_LESS: BINARY_OP(BOOL_VAL, <); break;
     case OP_ADD:  {
@@ -475,6 +487,16 @@ static InterpretResult run(){
         frame = &vm.frames[vm.frameCount -1];
         break;
     }
+    case OP_SUPER_INVOKE:{
+        ObjString* method = READ_STRING();
+        int argCount = READ_BYTE();
+        ObjClass* superclass = AS_CLASS(pop());
+        if(!invokeFromClass(superclass, method, argCount)){
+            return INTERPRET_RUNTIME_ERROR;
+        }
+        frame = &vm.frames[vm.frameCount - 1];
+        break;
+    }
     case OP_CLOSURE:{
         ObjFunction* function = AS_FUNCTION(READ_CONSTANT());
         ObjClosure* closure = newClosure(function);
@@ -499,6 +521,18 @@ static InterpretResult run(){
     }
     case OP_CLASS:{
         push(OBJ_VAL(newClass(READ_STRING())));
+        break;
+    }
+    case OP_INHERIT:{
+        Value superclass = peek(1);
+        if(!IS_CLASS(superclass)){
+            runtimeError("Superclass must be a class"); // TODO: This should be a compile time check
+            return INTERPRET_RUNTIME_ERROR;
+        }
+        ObjClass* subclass = AS_CLASS(peek(0));
+        tableAddAll(&AS_CLASS(superclass)->methods, &subclass->methods);
+
+        pop();//subclass
         break;
     }
     case OP_METHOD:

@@ -1,0 +1,51 @@
+class c
+{
+
+    init()
+    {
+	this.a = 1;
+	this.b = 1;
+	this.c = 1;
+	this.d = 1;
+	this.e = 1;
+	this.f = 1;
+	this.g = 1;
+	this.h = 1;
+	this.i = 1;
+	this.j = 1;
+	this.k = 1;
+	this.l = 1;
+	this.m = 1;
+	this.n = 1;
+    }
+
+    af(){return this.a;}
+    bf(){return this.b;}
+    cf(){return this.c;}
+    df(){return this.d;}
+    ef(){return this.e;}
+    ff(){return this.f;}
+    gf(){return this.g;}
+    hf(){return this.h;}
+    of(){return this.i;}
+    jf(){return this.j;}
+    kf(){return this.k;}
+    lf(){return this.l;}
+    mf(){return this.m;}
+    nf(){return this.n;}
+
+}
+
+var C = c();
+var sum = 0;
+var start = clock();
+while(sum < 100000000)
+{
+    sum = sum + C.af() + C.bf() + C.cf() + C.df() + C.ef() + C.ff() + C.gf() + C.hf() + C.of() + C.jf() + C.kf() + C.lf() + C.mf() + C.nf();
+
+
+}
+
+print "Ran for: ";
+print clock() - start;
+print sum;

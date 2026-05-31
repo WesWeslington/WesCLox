@@ -8,6 +8,22 @@ OBJ = $(SRC:.c=.o)
 ROOT := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 TEST_DIR := $(ROOT)tests
 
+ifeq ($(DEBUG_PRINT_CODE),1)
+	CFLAGS += -DDEBUG_PRINT_CODE
+endif
+
+ifeq ($(DEBUG_TRACE_EXECUTION),1)
+	CFLAGS += -DDEBUG_TRACE_EXECUTION
+endif
+
+ifeq ($(DEBUG_STRESS_GC),1)
+	CFLAGS += -DDEBUG_STRESS_GC
+endif
+
+ifeq ($(DEBUG_LOG_GC),1)
+	CFLAGS += -DDEBUG_LOG_GC
+endif
+
 all: $(TARGET)
 
 $(TARGET): $(OBJ)
@@ -31,13 +47,6 @@ run: $(TARGET)
 	./$(TARGET) $(FILE); \
 	end=$$(python3 -c 'import time; print(int(time.time()*1000))'); \
 	echo "Execution time: $$(($$end - $$start)) ms"
-
-CC = clang
-CFLAGS = -std=c2x -Wall -Wextra -g
-TARGET = main
-
-SRC = $(wildcard *.c)
-OBJ = $(SRC:.c=.o)
 
 all: $(TARGET)
 
