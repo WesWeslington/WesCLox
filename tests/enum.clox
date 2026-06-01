@@ -1,0 +1,37 @@
+enum e{a,b,c,d,f,g,h}
+
+var A = e.a;
+
+if(A == e.a){
+print "Test passes!";
+}else{
+print "Test fails!";
+}
+
+if(A != e.b){
+print "Test passes!";
+}else{
+print "Test fails!";
+}
+
+var B = e.h;
+
+if(B == e.a){
+ print "Test failed!";
+}else if(B == e.b){
+ print "Test failed!";
+}else if(B == e.c){
+ print "Test failed!";
+}else if(B == e.d){
+ print "Test failed!";
+}else if(B == e.e){
+ print "Test failed!";
+}else if(B == e.f){
+ print "Test failed!";
+}else if(B == e.g){
+ print "Test failed!";
+}else if(B == e.h){
+ print "Test passed!";
+}else{
+ print "Test failed (else)";
+}

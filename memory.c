@@ -79,6 +79,17 @@ static void freeObject(Obj* object){
         FREE(ObjClass, object);
         break;
     }
+    case OBJ_ENUMERATION:{
+        ObjEnumeration* _enum = (ObjEnumeration*)object;
+        FREE_ARRAY(ObjEnumeration, _enum->enumerators, MAX_ENUM_SIZE);
+        FREE(ObjEnumeration, _enum);
+        break;
+    }
+    case OBJ_ENUMERATOR:{
+        ObjEnumerator* _enum = (ObjEnumerator*)object;
+        FREE(ObjEnumerator, _enum);
+        break;
+    }
     case OBJ_CLOSURE:{
         FREE(ObjClosure, object);
         break;
@@ -178,6 +189,8 @@ static void blackenObject(Obj* object){
         markArray(&function->chunk.constants);
         break;
     }
+    case OBJ_ENUMERATOR:
+    case OBJ_ENUMERATION:
     case OBJ_NATIVE:
     case OBJ_STRING:
         break;

@@ -17,6 +17,23 @@ static Value clockNative(int argCount, Value* args){
     return NUMBER_VAL((double)clock() / CLOCKS_PER_SEC);
 }
 
+static bool IsInvocationEnum(ObjString* invokeName, ObjEnumerator* enumerator){
+        return memcmp(invokeName->chars, enumerator->name->chars, 0);
+}
+
+static bool hasEnumerator(ObjEnumeration* enumeration, ObjEnumerator* enumerator){
+    bool hasHitMax = false;
+    for(int EnumIndex = 0; EnumIndex < MAX_ENUM_SIZE; EnumIndex++){
+        char* curChars = enumeration->enumerators[EnumIndex].name->chars;
+        if(memcmp(curChars, "MAX", 0)){ return false;}
+        if(memcmp(enumerator->name->chars, curChars, 0)){
+            return true;
+        }
+    }
+
+    return false;
+}
+
 static void resetStack(){
   vm.stackTop = vm.stack;
   vm.frameCount = 0;
@@ -68,7 +85,8 @@ void initVM(){
   
   initTable(&vm.strings);
   initTable(&vm.globals);
-
+  initTable(&vm.enums);
+  
   vm.initString = NULL;
   vm.initString = copyString("init", 4);
 
@@ -80,6 +98,7 @@ void freeVM(){
     freeObjects();// TODO: BOOK calls this after free table string - potentially sus?
     vm.initString = NULL;
     freeTable(&vm.globals);
+    freeTable(&vm.enums);
 }
 
 void push(Value value){
@@ -165,7 +184,7 @@ static bool invokeFromClass(ObjClass* klass, ObjString* name, int argCount){
 
 static bool invoke(ObjString* name, int argCount){
     Value receiver = peek(argCount);
-
+    
     if(!IS_INSTANCE(receiver)){
         runtimeError("Only instances have methods");
         return false;
@@ -322,7 +341,6 @@ printf("\n======== Dissassemble OP Instruction =======\n");
         break;
     }
     case OP_GET_GLOBAL:{
-
         ObjString* name = READ_STRING();
         Value value;
         if(!tableGet(&vm.globals, name, &value)){
@@ -360,6 +378,29 @@ printf("\n======== Dissassemble OP Instruction =======\n");
         break;
     }
     case OP_GET_PROPERTY:{
+        Value inValue;
+
+        if(IS_ENUMERATION(peek(0))){
+            /* pop(); */
+            /* push(READ_CONSTANT()); */
+
+                                    
+            ObjEnumeration* enumeration = AS_ENUMERATION(pop());
+            Value enumeratorValue = READ_CONSTANT();
+            ObjEnumerator* enumerator = AS_ENUMERATOR(enumeratorValue);
+
+            if(enumeration && enumerator){
+                // TODO: Fix bug where invalid enum is still accessible in runtime.
+                //if(!hasEnumerator(enumeration, enumerator)){
+                    /* runtimeError("Enum '%s' does not have enumerator '%s'", enumeration->name->chars, enumerator->name->chars); */
+                //}
+            }
+            push(enumeratorValue);
+
+            
+            break;
+        }
+    
         if(!IS_INSTANCE(peek(0))){
             runtimeError("Only instances have properties.");
             return INTERPRET_RUNTIME_ERROR;
@@ -521,6 +562,39 @@ printf("\n======== Dissassemble OP Instruction =======\n");
     }
     case OP_CLASS:{
         push(OBJ_VAL(newClass(READ_STRING())));
+        break;
+    }
+    case OP_NEW_ENUMERATION:{
+        push(OBJ_VAL(newEnumeration(READ_STRING())));
+        //ObjEnumeration* _enum = AS_ENUMERATION(pop());
+        break;
+    }
+    case OP_NEW_ENUMERATOR:{
+        push(OBJ_VAL(newEnumerator(READ_STRING())));
+        break;
+    }
+    case OP_ENUM_MAX:{
+        pop(); // pop max value
+        Value currentValue = peek(0);
+        ObjEnumerator enumerators[MAX_ENUM_SIZE];
+        uint8_t index = 0;
+        while(!IS_ENUMERATION(currentValue)) {
+                enumerators[index] = *AS_ENUMERATOR(currentValue);
+                index++;
+                currentValue = pop();
+            }
+
+        /* ObjString* maxEnumString = copyString("MAX", 3); */
+        /* ObjEnumerator* maxEnumerator = newEnumerator(maxEnumString); */
+        /* enumerators[index] = *maxEnumerator; */
+        push(currentValue); 
+        ObjEnumeration* enumeration = newEnumeration(AS_ENUMERATION(peek(0))->name);
+        memmove(enumeration->enumerators, newEnumerator, sizeof(newEnumerator));
+
+        if(!tableSet(&vm.enums, AS_ENUMERATION(currentValue)->name, peek(0))){
+                runtimeError("Enum %s can only be defined 1 time.");
+            }
+ 
         break;
     }
     case OP_INHERIT:{

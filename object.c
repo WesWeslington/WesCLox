@@ -24,6 +24,18 @@ static Obj* allocateObject(size_t size, ObjType type){
     return object;
 }
 
+ObjEnumeration* newEnumeration(ObjString* name){
+    ObjEnumeration* _enum = ALLOCATE_OBJ(ObjEnumeration, OBJ_ENUMERATION);
+    _enum->name = name;
+    return _enum;
+}
+
+ObjEnumerator* newEnumerator(ObjString* name){
+    ObjEnumerator* _enum = ALLOCATE_OBJ(ObjEnumerator, OBJ_ENUMERATOR);
+    _enum->name = name;
+    return _enum;
+}
+
 ObjFunction* newFunction(){
     ObjFunction* function = ALLOCATE_OBJ(ObjFunction, OBJ_FUNCTION);
     function->upvalueCount = 0;
@@ -160,7 +172,12 @@ void printObject(Value value){
     case OBJ_NATIVE:
         printf("<native fn>");
         break;
-    
+    case OBJ_ENUMERATION:
+        printf("%s:", AS_ENUMERATION(value)->name->chars);
+        break;
+    case OBJ_ENUMERATOR:
+        printf(".%s", AS_ENUMERATOR(value)->name->chars);
+        break;
     case OBJ_UPVALUE:
         printf("upvalue");
         break;

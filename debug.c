@@ -97,6 +97,12 @@ int disassembleInstruction(Chunk* chunk, int offset){
       return simpleInstruction("OP_RETURN", offset);
   case OP_CLASS:
       return constantInstruction("OP_CLASS", chunk, offset);
+  case OP_NEW_ENUMERATION:
+      return constantInstruction("OP_NEW_ENUMERATION", chunk, offset);
+  case OP_NEW_ENUMERATOR:
+      return constantInstruction("OP_NEW_ENUMERATOR", chunk, offset);
+  case OP_ENUM_MAX:
+      return simpleInstruction("OP_ENUM_MAX", offset);
   case OP_INHERIT:
       return simpleInstruction("OP_INHERIT", offset);
   case OP_METHOD:

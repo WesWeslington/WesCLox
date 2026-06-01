@@ -6,6 +6,8 @@
 #include "table.h"
 #include "value.h"
 
+#define MAX_ENUM_SIZE 16
+
 #define OBJ_TYPE(value)          (AS_OBJ(value)->type)
 #define IS_STRING(value)         isObjType(value, OBJ_STRING)
 #define IS_FUNCTION(value)       isObjType(value, OBJ_FUNCTION)
@@ -14,6 +16,8 @@
 #define IS_CLASS(value)          isObjType(value, OBJ_CLASS)
 #define IS_INSTANCE(value)       isObjType(value, OBJ_INSTANCE)
 #define IS_BOUND_METHOD(value)   isObjType(value, OBJ_BOUND_METHOD)
+#define IS_ENUMERATION(value)    isObjType(value, OBJ_ENUMERATION)
+#define IS_ENUMERATOR(value)     isObjType(value, OBJ_ENUMERATOR)
 
 #define AS_STRING(value)         ((ObjString*)AS_OBJ(value))
 #define AS_CSTRING(value)        (((ObjString*)AS_OBJ(value))->chars)
@@ -23,6 +27,8 @@
 #define AS_CLASS(value)          ((ObjClass*)AS_OBJ(value))
 #define AS_INSTANCE(value)       ((ObjInstance*)AS_OBJ(value))
 #define AS_BOUND_METHOD(value)   ((ObjBoundMethod*)AS_OBJ(value))
+#define AS_ENUMERATION(value)    ((ObjEnumeration*)AS_OBJ(value))
+#define AS_ENUMERATOR(value)     ((ObjEnumerator*)AS_OBJ(value))
 
 typedef enum{
     OBJ_BOUND_METHOD,
@@ -32,7 +38,9 @@ typedef enum{
     OBJ_INSTANCE,
     OBJ_NATIVE,
     OBJ_STRING,
-    OBJ_UPVALUE
+    OBJ_UPVALUE,
+    OBJ_ENUMERATION,
+    OBJ_ENUMERATOR
 }ObjType;
 
 struct Obj{
@@ -96,6 +104,19 @@ typedef struct{
     ObjClosure* method;
 } ObjBoundMethod;
 
+typedef struct{
+    Obj obj;
+    ObjString* name;
+} ObjEnumerator;
+
+typedef struct{
+    Obj obj;
+    ObjString* name;
+    ObjEnumerator enumerators[MAX_ENUM_SIZE];
+} ObjEnumeration;
+
+ObjEnumeration* newEnumeration(ObjString* name);
+ObjEnumerator* newEnumerator(ObjString* name);
 ObjFunction* newFunction();
 ObjNative* newNative(NativeFn function);
 ObjClosure* newClosure(ObjFunction* function);

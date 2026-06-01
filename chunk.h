@@ -42,6 +42,9 @@ typedef enum{
     OP_QUERY,
     OP_RETURN,
     OP_CLASS,
+    OP_NEW_ENUMERATION,
+    OP_NEW_ENUMERATOR,
+    OP_ENUM_MAX,
     OP_INHERIT,
     OP_EOF // LEGACY
 } OpCode;

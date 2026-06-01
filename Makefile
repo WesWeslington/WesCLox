@@ -1,5 +1,5 @@
 CC = clang
-CFLAGS = -std=c2x -Wall -Wextra -g
+CFLAGS = -std=c2x -Wall -Wextra -g -Wno-unused-parameter
 TARGET = main
 
 SRC = $(wildcard *.c)

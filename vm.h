@@ -22,6 +22,7 @@ typedef struct{
     Value* stackTop;
     Table globals;
     Table strings;
+    Table enums;
     ObjString* initString;
     ObjUpvalue* openUpvalues;
 

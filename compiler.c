@@ -505,7 +505,6 @@ static void function(FunctionType type){
 static void method(){
     consume(TOKEN_IDENTIFIER, "Expect method name.");
     uint8_t constant = identifierConstant(&parser.previous);
-
     
     FunctionType type = TYPE_METHOD;
     if(parser.previous.length == 4 &&
@@ -561,6 +560,35 @@ static void classDeclaration(){
     }
 
     currentClass = currentClass->enclosing;
+}
+
+// Syntax: enum e {A, B, C}
+static void enumDeclaration(){
+    uint8_t enumCount = 0;
+    uint8_t global = parseVariable("Expect enum name.");
+    Token enumName = parser.previous;
+
+    declareVariable();
+    emitBytes(OP_NEW_ENUMERATION, global);
+    defineVariable(global);
+    namedVariable(enumName, false);
+
+    consume(TOKEN_LEFT_BRACE,  "Expect '{' before enum body.");
+    if(!check(TOKEN_RIGHT_BRACE)){
+        do{
+            consume(TOKEN_IDENTIFIER, "Expecting identifier for enumerator");
+            Token enumerator = parser.previous;
+            uint8_t enumConstant = identifierConstant(&enumerator);
+            emitBytes(OP_NEW_ENUMERATOR, enumConstant);
+            enumCount++;
+        }
+        while(match(TOKEN_COMMA));
+    }
+    // To tell runtime when the enum ends
+
+    consume(TOKEN_RIGHT_BRACE,  "Expect '}' after enum body.");
+
+    emitByte(OP_ENUM_MAX);
 }
 
 static void funDeclaration(){
@@ -726,6 +754,8 @@ static void synchronize(){
 static void declaration(){
     if(match(TOKEN_CLASS)){
         classDeclaration();
+    }else if(match(TOKEN_ENUM)){
+        enumDeclaration();
     }else if(match(TOKEN_FUN)){
         funDeclaration();
     }else if(match(TOKEN_VAR)){
@@ -928,6 +958,7 @@ ParseRule rules[] = {
     [TOKEN_NUMBER]          = {number,    NULL, PREC_NONE},
     [TOKEN_AND]             = {NULL,    and_, PREC_AND},
     [TOKEN_CLASS]           = {NULL,    NULL, PREC_NONE},
+    [TOKEN_ENUM]            = {NULL,    NULL, PREC_NONE},
     [TOKEN_ELSE]            = {NULL,    NULL, PREC_NONE},
     [TOKEN_FALSE]           = {literal,    NULL, PREC_NONE},
     [TOKEN_FOR]             = {NULL,    NULL, PREC_NONE},
